@@ -21,16 +21,11 @@ Prompts:
 
 ## 3. How the Model Works  
 
-Explain your scoring approach in simple language.  
+Think of it like a judge scoring a talent show, one contestant (song) at a time. Every song walks in with zero points, and it earns points for matching what the listener said they want: a bonus if the genre matches exactly, a smaller bonus if the mood matches, a sliding bonus for how close the song's energy is to what they asked for (not just "more energy is better" — being too energetic is penalized the same as not being energetic enough), and a small bonus for acousticness depending on whether the listener said they like acoustic sound or not. Genre counts for the most points because it felt like the most deliberate thing a listener tells you about their taste, with mood worth a bit less, and the two numeric features acting as smaller nudges on top.
 
-Prompts:  
+Once every song in the catalog has a score, the model just sorts them from highest to lowest and hands back the top handful — that sorted list is the "recommendation." Along the way it also keeps a short list of plain-English reasons for each song (like "genre match (+2.0)") so a listener can see exactly why something was suggested instead of just trusting a mystery number.
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+The starter code was just empty placeholders (`# TODO: Implement...`) with no scoring or ranking at all — everything described above, including the point values and the reason messages, was designed and written from scratch rather than tweaked from an existing version.
 
 ---
 
