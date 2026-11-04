@@ -118,11 +118,9 @@ Top recommendations:
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+**Weight shift: genre 2.0 → 1.0, energy 1.0 → 2.0** (tested on the "Deep Intense Rock" profile: `genre=rock, mood=intense, energy=0.9`). Default weights ranked Storm Runner (4.94), Gym Hero (2.94), Neon Pulse (1.44), Crimson Riot (1.42), Neon Skyline (1.40). After the shift: Storm Runner (4.93), Gym Hero (3.92), Neon Pulse (2.42), Neon Skyline (2.35), Crimson Riot (2.35) — the #1 and #2 songs didn't change at all, because Storm Runner already wins on genre *and* mood *and* energy, so no single-weight change could unseat it. The scores at the bottom got closer together and position 4/5 flipped, but the recommendation a user actually sees (the top result) was identical either way. **Takeaway:** the weights matter a lot for close calls, but a song that's a strong match on every axis is robust to re-weighting — this experiment made the *scores* different, not meaningfully more or less accurate.
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+**How different user types behave:** three named profiles (`High-Energy Pop`, `Chill Lofi`, `Deep Intense Rock`) each produce completely non-overlapping top-5 lists (see Sample Recommendation Output and `model_card.md` Evaluation section for full terminal output) — confirming the ranking is genuinely personalized rather than returning catalog order. Full stress-test output, including adversarial/edge-case profiles, is documented in `model_card.md`.
 
 ---
 
