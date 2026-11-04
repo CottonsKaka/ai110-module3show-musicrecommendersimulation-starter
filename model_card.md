@@ -2,20 +2,17 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+**VibeDial 1.0** — because it works like turning a few dials (genre, mood, energy, acousticness) rather than anything that actually "understands" music.
 
 ---
 
 ## 2. Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
+**Designed for:** a classroom demo of content-based recommendation on a small, curated, 18-song catalog. It's meant to show how a handful of weighted rules can turn song attributes and a stated taste profile into a ranked, explainable list — nothing more.
 
-Prompts:  
+It assumes the "user" can state explicit preferences up front (a favorite genre, a favorite mood, a target energy, an acoustic yes/no) rather than being inferred from behavior. It's for exploration and learning, not real listeners — there's no account system, no persistence of taste over time, and no real audio analysis (the numeric features are hand-entered, not computed from actual audio).
 
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+**Not intended for:** making real music-streaming product decisions, inferring anything about a real person's demographics or identity from their stated preferences, or running on a catalog much larger than a few dozen songs without a redesign — the exact-match genre/mood scoring and the tiny hand-built dataset don't scale to real-world catalog sizes or diversity.
 
 ---
 
@@ -31,26 +28,19 @@ The starter code was just empty placeholders (`# TODO: Implement...`) with no sc
 
 ## 4. Data  
 
-Describe the dataset the model uses.  
+18 songs total in `data/songs.csv` — the original 10 from the starter file, plus 8 I added to cover genres and moods that were completely missing (electronic, blues, metal, r&b, folk, classical, reggae, k-pop; euphoric, melancholic, angry, romantic, nostalgic, dreamy, triumphant). Each song has 7 attributes beyond its id/title/artist: genre, mood, energy, tempo_bpm, valence, danceability, acousticness — all on a 0.0–1.0 scale except tempo_bpm.
 
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+Even at 18 songs, 13 different genres appear exactly once each, so most genres have zero internal variety to rank between. Whole dimensions of real musical taste are missing entirely: lyrics and language, instrumentation, era/decade, cultural or regional style, an artist's broader catalog or popularity, and any notion of how a song changes over its own runtime (tempo/energy here are single fixed numbers per song, not a timeline).
 
 ---
 
 ## 5. Strengths  
 
-Where does your system seem to work well  
+It's clearly personalized, not just catalog order: the three main test profiles (High-Energy Pop, Chill Lofi, Deep Intense Rock) each produced a completely different, non-overlapping top 5 — see Section 7. It works best for a user whose favorite genre has more than one song in the catalog (pop, lofi), since there's actual competition to rank between.
 
-Prompts:  
+The explanations match my intuition about *why* a song should rank where it does — Sunrise City winning the High-Energy Pop profile because it hits genre, mood, and energy all at once feels obviously correct, and I could predict most of the top-3 results before running the code just by eyeballing the CSV.
 
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+It also doesn't break on messy input. An empty profile, a nonexistent genre, or a self-contradictory profile (high energy + a mood no song has) all still return a ranked list instead of crashing — the system degrades to energy-only ranking rather than failing outright, which is a reasonable fallback even if it isn't flagged as one (see Section 6).
 
 ---
 
@@ -122,23 +112,16 @@ I tested three "normal" taste profiles and three adversarial/edge-case profiles 
 
 ## 8. Future Work  
 
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+1. **Partial credit for similar genres/moods** instead of strict exact-match — right now "indie pop" gets zero credit from a "pop" fan even though they're obviously related. A small similarity table (or genre embedding) would fix the single-song-per-genre bottleneck described in Section 6.
+2. **A real "no good match" signal** — when a user's genre/mood isn't in the catalog at all, the system should say so instead of quietly falling back to energy-only ranking and presenting the result with full confidence.
+3. **A simulated collaborative signal** layered on top — even a fake "other listeners who liked X also liked Y" table would let the system recommend outside a user's stated genre/mood, which right now it structurally cannot do (see "How The System Works" in the README).  
 
 ---
 
 ## 9. Personal Reflection  
 
-A few sentences about your experience.  
+My biggest learning moment was realizing scoring and ranking are genuinely two separate problems, not one — I kept wanting to think of "the algorithm" as one thing, but scoring only ever looks at one song in isolation, and ranking is the step that turns a pile of numbers into an actual ordered list. Once I had that split clear, debugging why a particular song ranked where it did got a lot easier, because I could check the score breakdown first and the sort order second instead of guessing at both at once.
 
-Prompts:  
+AI tools helped most with speed and with making the design decisions explicit instead of leaving them implicit in code I'd forget the reasoning for later — walking through the weighting choices (why genre outweighs mood, how to turn "closer energy is better" into a formula) out loud before writing anything meant I understood the recipe rather than just having working code. Where I had to double-check things: the weighting (2.0 genre / 1.5 mood / etc.) is a judgment call dressed up as a formula, not a provably "correct" answer, so I made sure to actually run adversarial profiles rather than assume the math was fair just because it was consistent. I also had to re-verify sample outputs in the README after expanding the dataset, since a code sample that was accurate against the original 10-song catalog silently became stale once I added 8 more songs — nothing flags that kind of drift automatically.
 
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+What surprised me is how much a handful of weighted if-statements can already *feel* like a real recommendation — and how quickly that same simplicity produces a real bias, not a hypothetical one. Gym Hero legitimately shows up near the top for both a "happy" profile and an "intense" profile, which is a small-scale version of the same "the algorithm thinks everyone wants the loudest thing" complaint people make about real platforms. If I extended this project, I'd want to try the partial-credit genre similarity idea from Section 8 first, since the single-song-per-genre problem feels like the most concrete, fixable flaw I found.

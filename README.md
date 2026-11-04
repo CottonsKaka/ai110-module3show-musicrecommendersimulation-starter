@@ -11,7 +11,7 @@ Your goal is to:
 - Evaluate what your system gets right and wrong
 - Reflect on how this mirrors real world AI recommenders
 
-Replace this paragraph with your own summary of what your version does.
+This version, **VibeDial 1.0**, represents each song as a set of attributes (genre, mood, energy, tempo, valence, danceability, acousticness) and each user as a small taste profile (favorite genre, favorite mood, target energy, and whether they like acoustic sound). The `Recommender` scores every song against the profile using a weighted rule, ranks songs highest-score-first, and returns the top `k` along with a plain-language explanation of why each one was picked. See `model_card.md` for the full writeup, including how it behaves under adversarial and edge-case profiles.
 
 ---
 
@@ -144,10 +144,9 @@ Read and complete `model_card.md`:
 
 [**Model Card**](model_card.md)
 
-Write 1 to 2 paragraphs here about what you learned:
+Building this made it concrete that a recommender doesn't "understand" music at all — it turns data into predictions by picking a handful of attributes, assigning each one a point value, adding them up per song, and sorting. That's it. There's no magic in the middle; the "prediction" is just the highest-scoring row after a loop. What surprised me is how convincing that can still feel: when the weights are tuned reasonably, the output looks like genuine taste-matching even though the system has no idea what a song sounds like beyond a handful of numbers someone typed into a CSV.
 
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+Bias shows up fastest in whatever the dataset is thin on. In my 18-song catalog, 13 of the genres have exactly one song each, so a listener's "favorite genre" bonus only ever has one possible winner — the system can't actually discriminate between good and bad fits within an underrepresented genre, it just defaults to whatever's there. I also found that genre and energy together can outweigh mood, so the same high-energy pop song showed up as a top pick for both a "happy" and an "intense" profile — a small, very literal example of a recommender flattening two different requests into the same loud answer. Full details and terminal output are in [`model_card.md`](model_card.md).
 
 
 
